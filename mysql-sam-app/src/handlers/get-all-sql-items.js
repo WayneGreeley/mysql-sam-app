@@ -1,5 +1,5 @@
 const AWS = require('aws-sdk');
-const mysql = require('serverless-mysql');
+const mysql = require('serverless-mysql')() // <-- initialize with function call?
 
 const secretclient = new AWS.SecretsManager();
 const secretlink = process.env.SECRET_LINK;

@@ -208,6 +208,11 @@ Resources:
       Engine: aurora
       EngineMode: serverless
       EnableHttpEndpoint: true
+      ScalingConfiguration:
+        AutoPause: true
+        MaxCapacity: 4
+        MinCapacity: 2
+        SecondsUntilAutoPause: 3000
       MasterUsername: !Sub '{{resolve:secretsmanager:${RDSSecret}::username}}'
       MasterUserPassword: !Sub '{{resolve:secretsmanager:${RDSSecret}::password}}'
       Port: 3306
@@ -238,8 +243,14 @@ Resources:
       Handler: src/handlers/get-all-sql-items.getAllItemsHandler
       Runtime: nodejs12.x
       MemorySize: 128
-      Timeout: 100
+      Timeout: 29
       Description: A simple example includes a HTTP get method to get all items from a MYSQL table.
+      VpcConfig: 
+        SecurityGroupIds: 
+          - !Ref SecurityGroup
+        SubnetIds: 
+          - !Ref SubnetA
+          - !Ref SubnetB
       Policies:
         - Version: '2012-10-17' # Policy Document
           Statement:
