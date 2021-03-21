@@ -6,6 +6,9 @@ SAM application with mysql
 - sam init
 ![sam init](/images/sam-init.png "sam init")
 
+- npm install uuid --save
+- npm install serverless-mysql --save
+
 - sam build
 ![sam build](/images/sam-build.png "sam build")
 
