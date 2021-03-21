@@ -1,13 +1,8 @@
 const AWS = require('aws-sdk');
+const mysql = require('serverless-mysql');
 
 const secretclient = new AWS.SecretsManager();
-
-var params = {
-    SecretId : "RDSSecret-3CR2vSUUhxJd"
-};
-
-// Get the DynamoDB table name from environment variables
-const tableName = process.env.SAMPLE_TABLE;
+const secretlink = process.env.SECRET_LINK;
 
 /**
  * A simple example includes a HTTP get method to get all items from a MySQL table.
@@ -15,18 +10,44 @@ const tableName = process.env.SAMPLE_TABLE;
 exports.getAllItemsHandler = async (event) => {
     // All log statements are written to CloudWatch
     console.info('received:', event);
-    console.log("tableName",tableName);
+    console.log("secretlink",secretlink);
 
+    var params = {
+        SecretId: secretlink
+    };
 
     const secretResponse = await secretclient.getSecretValue(params).promise();
 
-    console.log("secretResponse",secretResponse);
+    // console.log("secretResponse",secretResponse);
+    
+    const dbname = JSON.parse(secretResponse.SecretString).dbname;
+    const dbport = JSON.parse(secretResponse.SecretString).port;
+    const dbhost = JSON.parse(secretResponse.SecretString).host;
+    const dbusername = JSON.parse(secretResponse.SecretString).username;
+    const dbpassword = JSON.parse(secretResponse.SecretString).password;
+    // console.log("dbname",dbname);
+    // console.log("dbport",dbport);
+    // console.log("dbhost",dbhost);
+    // console.log("dbusername",dbusername);
+    // console.log("dbpassword",dbpassword);
 
-    const items = '';
+    mysql.config({
+        host     : dbhost,
+        port     : dbport,
+        database : dbname,
+        user     : dbusername,
+        password : dbpassword
+    })
+    
+    // Run your query
+    let results = await mysql.query('SELECT * FROM Persons')
+
+    // Run clean up function
+    await mysql.end()
 
     const response = {
         statusCode: 200,
-        body: JSON.stringify(items)
+        body: JSON.stringify(results)
     };
 
     // All log statements are written to CloudWatch

@@ -247,15 +247,13 @@ Resources:
               Action:
                 - rds-data:*
                 - rds-db:*
-              Resource: !Ref DatabaseCluster
+              Resource: !Sub arn:aws:rds:${AWS::Region}:${AWS::AccountId}:cluster:${DatabaseCluster}
             - Effect: Allow
               Action:
                 - secretsmanager:GetSecretValue
               Resource: !Ref RDSSecret
       Environment:
         Variables:
-          # Make table name accessible as environment variable from function code during execution
-          SAMPLE_TABLE: !Ref SampleTable
           SECRET_LINK: !Ref RDSSecret
 
 Outputs:
