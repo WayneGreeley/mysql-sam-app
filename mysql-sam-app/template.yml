@@ -266,6 +266,12 @@ Resources:
       Environment:
         Variables:
           SECRET_LINK: !Ref RDSSecret
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /allsql/
+            Method: GET
 
 Outputs:
   WebEndpoint:

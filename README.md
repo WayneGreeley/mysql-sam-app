@@ -40,3 +40,33 @@ GET:  https://<YOUR_ID>.execute-api.us-east-1.amazonaws.com/Prod/
 ```
 GET:  https://<YOUR_ID>.execute-api.us-east-1.amazonaws.com/Prod/1
 ```
+
+
+- test get-all-sql-items
+```
+GET:  https://<YOUR_ID>.execute-api.us-east-1.amazonaws.com/Prod/allsql/
+```
+
+
+
+SQL to initially seed DB...
+
+
+
+use myawesomedatabase;
+CREATE TABLE Persons (
+  userId INT,
+  firstName VARCHAR(60),
+  lastName VARCHAR(60)
+);
+
+use myawesomedatabase;
+SELECT * FROM Persons;
+
+
+use myawesomedatabase;
+insert into Persons (userId, firstName, lastName) values (1, 'foo', 'bar');
+
+
+
+TODO: current SQL connect is timing out; I think DB permission is missing.
