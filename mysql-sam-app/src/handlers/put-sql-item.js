@@ -4,34 +4,24 @@ const mysql = require('serverless-mysql')() // <-- initialize with function call
 const secretclient = new AWS.SecretsManager();
 const secretlink = process.env.SECRET_LINK;
 
-var params = {
-    SecretId: secretlink
-};
-
-function getAwsSecret() {
-    return secretclient.getSecretValue(params).promise();
-}
-
-async function getAwsSecretAsync () {
-    try {
-        const response = await getAwsSecret();
-        return response;
-    } catch (error) {
-        console.error('Error occurred while retrieving AWS secret');
-        console.error(error);
-    }
-}
-
 /**
- * A simple example includes a HTTP get method to get all items from a MySQL table.
+ * A simple example includes a HTTP post method to add one item to a DynamoDB table.
  */
-exports.getAllItemsHandler = async (event) => {
+exports.putItemHandler = async (event, context) => {
+    context.callbackWaitsForEmptyEventLoop = false;
+    if (event.httpMethod !== 'POST') {
+        throw new Error(`postMethod only accepts POST method, you tried: ${event.httpMethod} method.`);
+    }
     // All log statements are written to CloudWatch
     console.info('received:', event);
-    console.log("secretlink",secretlink);
 
-    // const secretResponse = await secretclient.getSecretValue(params).promise();
-    const secretResponse = await getAwsSecretAsync();
+    var params = {
+        SecretId: secretlink
+    };
+
+    console.log("before secret",secretlink);
+    const secretResponse = await secretclient.getSecretValue(params).promise();
+    console.log("after secret");
 
     // console.log("secretResponse",secretResponse);
     
@@ -40,11 +30,7 @@ exports.getAllItemsHandler = async (event) => {
     const dbhost = JSON.parse(secretResponse.SecretString).host;
     const dbusername = JSON.parse(secretResponse.SecretString).username;
     const dbpassword = JSON.parse(secretResponse.SecretString).password;
-    // console.log("dbname",dbname);
-    // console.log("dbport",dbport);
-    // console.log("dbhost",dbhost);
-    // console.log("dbusername",dbusername);
-    // console.log("dbpassword",dbpassword);
+    console.log("dbname",dbname);
 
     mysql.config({
         host     : dbhost,
@@ -53,12 +39,18 @@ exports.getAllItemsHandler = async (event) => {
         user     : dbusername,
         password : dbpassword
     })
+    console.log("before");
     
-    // Run your query
-    let results = await mysql.query('SELECT * FROM Persons')
+    var post  = {userId: 10, firstName: 'Insert', lastName: 'Example'};
+    var results = await mysql.query('INSERT INTO Persons SET ?', post, function (error, results, fields) {
+        if (error) throw error;
+      // Neat!
+    });
+    
+    console.log(results);
 
     // Run clean up function
-    await mysql.end()
+    await mysql.quit();
 
     const response = {
         statusCode: 200,

@@ -69,4 +69,6 @@ insert into Persons (userId, firstName, lastName) values (1, 'foo', 'bar');
 
 
 
-TODO: current SQL connect is timing out; I think DB permission is missing.
+TODO: get secret promise is not resolving
+
+    const secretResponse = await secretclient.getSecretValue(params).promise();
