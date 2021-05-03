@@ -58,7 +58,7 @@ exports.getAllItemsHandler = async (event) => {
     let results = await mysql.query('SELECT * FROM Persons')
 
     // Run clean up function
-    await mysql.end()
+    mysql.quit();
 
     const response = {
         statusCode: 200,

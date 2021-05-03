@@ -242,7 +242,7 @@ Resources:
     Properties:
       Handler: src/handlers/get-all-sql-items.getAllItemsHandler
       Runtime: nodejs12.x
-      MemorySize: 128
+      MemorySize: 2048
       Timeout: 29
       Description: A simple example includes a HTTP get method to get all items from a MYSQL table.
       VpcConfig: 
@@ -278,7 +278,7 @@ Resources:
     Properties:
       Handler: src/handlers/put-sql-item.putItemHandler
       Runtime: nodejs12.x
-      MemorySize: 128
+      MemorySize: 2048
       Timeout: 29
       Description: A simple example includes a HTTP post method to put an item into a MYSQL table.
       VpcConfig: 

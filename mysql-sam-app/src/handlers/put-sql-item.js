@@ -8,7 +8,7 @@ const secretlink = process.env.SECRET_LINK;
  * A simple example includes a HTTP post method to add one item to a DynamoDB table.
  */
 exports.putItemHandler = async (event, context) => {
-    context.callbackWaitsForEmptyEventLoop = false;
+    // context.callbackWaitsForEmptyEventLoop = false;
     if (event.httpMethod !== 'POST') {
         throw new Error(`postMethod only accepts POST method, you tried: ${event.httpMethod} method.`);
     }
@@ -50,7 +50,7 @@ exports.putItemHandler = async (event, context) => {
     console.log(results);
 
     // Run clean up function
-    await mysql.quit();
+    mysql.quit();
 
     const response = {
         statusCode: 200,
