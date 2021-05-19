@@ -15,6 +15,12 @@ exports.putItemHandler = async (event, context) => {
     // All log statements are written to CloudWatch
     console.info('received:', event);
 
+    // Get id and name from the body of the request
+    const body = JSON.parse(event.body)
+    const userId = body.userId;
+    const firstName = body.firstName;
+    const lastName = body.lastName;
+
     var params = {
         SecretId: secretlink
     };
