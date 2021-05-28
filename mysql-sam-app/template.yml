@@ -245,12 +245,12 @@ Resources:
       MemorySize: 2048
       Timeout: 29
       Description: A simple example includes a HTTP get method to get all items from a MYSQL table.
-      VpcConfig: 
-        SecurityGroupIds: 
-          - !Ref SecurityGroup
-        SubnetIds: 
-          - !Ref SubnetA
-          - !Ref SubnetB
+      # VpcConfig: 
+      #   SecurityGroupIds: 
+      #     - !Ref SecurityGroup
+      #   SubnetIds: 
+      #     - !Ref SubnetA
+      #     - !Ref SubnetB
       Policies:
         - Version: '2012-10-17' # Policy Document
           Statement:
@@ -281,12 +281,12 @@ Resources:
       MemorySize: 2048
       Timeout: 29
       Description: A simple example includes a HTTP get method to get one item from a MYSQL table.
-      VpcConfig: 
-        SecurityGroupIds: 
-          - !Ref SecurityGroup
-        SubnetIds: 
-          - !Ref SubnetA
-          - !Ref SubnetB
+      # VpcConfig: 
+      #   SecurityGroupIds: 
+      #     - !Ref SecurityGroup
+      #   SubnetIds: 
+      #     - !Ref SubnetA
+      #     - !Ref SubnetB
       Policies:
         - Version: '2012-10-17' # Policy Document
           Statement:
@@ -317,12 +317,12 @@ Resources:
       MemorySize: 2048
       Timeout: 29
       Description: A simple example includes a HTTP post method to put an item into a MYSQL table.
-      VpcConfig: 
-        SecurityGroupIds: 
-          - !Ref SecurityGroup
-        SubnetIds: 
-          - !Ref SubnetA
-          - !Ref SubnetB
+      # VpcConfig: 
+      #   SecurityGroupIds: 
+      #     - !Ref SecurityGroup
+      #   SubnetIds: 
+      #     - !Ref SubnetA
+      #     - !Ref SubnetB
       Policies:
         - Version: '2012-10-17' # Policy Document
           Statement:
