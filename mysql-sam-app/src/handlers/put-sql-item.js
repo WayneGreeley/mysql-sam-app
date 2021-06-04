@@ -1,14 +1,20 @@
 const AWS = require('aws-sdk');
-const mysql = require('serverless-mysql')() // <-- initialize with function call?
+const RDS = new AWS.RDSDataService();
 
-const secretclient = new AWS.SecretsManager();
-const secretlink = process.env.SECRET_LINK;
+var params = {
+    secretArn: process.env.SECRET_ARN,
+    resourceArn: process.env.CLUSTER_ARN,
+    database: process.env.DATABASE_NAME,
+    sql: ''
+};
 
 /**
  * A simple example includes a HTTP post method to add one item to a DynamoDB table.
  */
-exports.putItemHandler = async (event, context) => {
-    // context.callbackWaitsForEmptyEventLoop = false;
+exports.putItemHandler = async (event) => {
+    // All log statements are written to CloudWatch
+    console.info('params:', params);
+
     if (event.httpMethod !== 'POST') {
         throw new Error(`postMethod only accepts POST method, you tried: ${event.httpMethod} method.`);
     }
@@ -20,43 +26,20 @@ exports.putItemHandler = async (event, context) => {
     const userId = body.userId;
     const firstName = body.firstName;
     const lastName = body.lastName;
-
-    var params = {
-        SecretId: secretlink
-    };
-
-    console.log("before secret",secretlink);
-    const secretResponse = await secretclient.getSecretValue(params).promise();
-    console.log("after secret");
-
-    // console.log("secretResponse",secretResponse);
-    
-    const dbname = JSON.parse(secretResponse.SecretString).dbname;
-    const dbport = JSON.parse(secretResponse.SecretString).port;
-    const dbhost = JSON.parse(secretResponse.SecretString).host;
-    const dbusername = JSON.parse(secretResponse.SecretString).username;
-    const dbpassword = JSON.parse(secretResponse.SecretString).password;
-    console.log("dbname",dbname);
-
-    mysql.config({
-        host     : dbhost,
-        port     : dbport,
-        database : dbname,
-        user     : dbusername,
-        password : dbpassword
-    })
-    console.log("before");
     
     var post  = {userId: 10, firstName: 'Insert', lastName: 'Example'};
-    var results = await mysql.query('INSERT INTO Persons SET ?', post, function (error, results, fields) {
-        if (error) throw error;
-      // Neat!
-    });
     
-    console.log(results);
 
-    // Run clean up function
-    mysql.quit();
+    params.sql = `INSERT INTO Persons (userId, firstName, lastName) 
+    VALUES ('${userId}','${firstName}','${lastName}'); `
+
+    let result = {}
+    try {
+        result = await RDS.executeStatement(params).promise();
+        console.log("result",result);
+    } catch (error) {
+        console.error(error)
+    }
 
     const response = {
         statusCode: 200,

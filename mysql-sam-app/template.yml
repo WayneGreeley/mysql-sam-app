@@ -204,7 +204,7 @@ Resources:
   DatabaseCluster:
     Type: AWS::RDS::DBCluster
     Properties:
-      DatabaseName: myawesomedatabase
+      DatabaseName: 'myawesomedatabase'
       Engine: aurora
       EngineMode: serverless
       EnableHttpEndpoint: true
@@ -245,48 +245,6 @@ Resources:
       MemorySize: 2048
       Timeout: 29
       Description: A simple example includes a HTTP get method to get all items from a MYSQL table.
-      # VpcConfig: 
-      #   SecurityGroupIds: 
-      #     - !Ref SecurityGroup
-      #   SubnetIds: 
-      #     - !Ref SubnetA
-      #     - !Ref SubnetB
-      Policies:
-        - Version: '2012-10-17' # Policy Document
-          Statement:
-            - Effect: Allow
-              Action:
-                - rds-data:*
-                - rds-db:*
-              Resource: !Sub arn:aws:rds:${AWS::Region}:${AWS::AccountId}:cluster:${DatabaseCluster}
-            - Effect: Allow
-              Action:
-                - secretsmanager:GetSecretValue
-              Resource: !Ref RDSSecret
-      Environment:
-        Variables:
-          SECRET_LINK: !Ref RDSSecret
-      Events:
-        Api:
-          Type: Api
-          Properties:
-            Path: /allsql/
-            Method: GET
-
-  getSqlItemFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: src/handlers/get-sql-item.getItemsHandler
-      Runtime: nodejs12.x
-      MemorySize: 2048
-      Timeout: 29
-      Description: A simple example includes a HTTP get method to get one item from a MYSQL table.
-      # VpcConfig: 
-      #   SecurityGroupIds: 
-      #     - !Ref SecurityGroup
-      #   SubnetIds: 
-      #     - !Ref SubnetA
-      #     - !Ref SubnetB
       Policies:
         - Version: '2012-10-17' # Policy Document
           Statement:
@@ -303,7 +261,39 @@ Resources:
         Variables:
           SECRET_ARN: !Ref RDSSecret
           CLUSTER_ARN: !Sub arn:aws:rds:${AWS::Region}:${AWS::AccountId}:cluster:${DatabaseCluster}
-          DATABASE_NAME: !GetAtt 'DatabaseCluster.DatabaseName'
+          DATABASE_NAME: 'myawesomedatabase'
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /allsql/
+            Method: GET
+
+  getSqlItemFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/get-sql-item.getItemsHandler
+      Runtime: nodejs12.x
+      MemorySize: 2048
+      Timeout: 29
+      Description: A simple example includes a HTTP get method to get one item from a MYSQL table.
+      Policies:
+        - Version: '2012-10-17' # Policy Document
+          Statement:
+            - Effect: Allow
+              Action:
+                - rds-data:*
+                - rds-db:*
+              Resource: !Sub arn:aws:rds:${AWS::Region}:${AWS::AccountId}:cluster:${DatabaseCluster}
+            - Effect: Allow
+              Action:
+                - secretsmanager:GetSecretValue
+              Resource: !Ref RDSSecret
+      Environment:
+        Variables:
+          SECRET_ARN: !Ref RDSSecret
+          CLUSTER_ARN: !Sub arn:aws:rds:${AWS::Region}:${AWS::AccountId}:cluster:${DatabaseCluster}
+          DATABASE_NAME: 'myawesomedatabase'
       Events:
         Api:
           Type: Api
@@ -319,12 +309,6 @@ Resources:
       MemorySize: 2048
       Timeout: 29
       Description: A simple example includes a HTTP post method to put an item into a MYSQL table.
-      # VpcConfig: 
-      #   SecurityGroupIds: 
-      #     - !Ref SecurityGroup
-      #   SubnetIds: 
-      #     - !Ref SubnetA
-      #     - !Ref SubnetB
       Policies:
         - Version: '2012-10-17' # Policy Document
           Statement:
@@ -339,7 +323,9 @@ Resources:
               Resource: !Ref RDSSecret
       Environment:
         Variables:
-          SECRET_LINK: !Ref RDSSecret
+          SECRET_ARN: !Ref RDSSecret
+          CLUSTER_ARN: !Sub arn:aws:rds:${AWS::Region}:${AWS::AccountId}:cluster:${DatabaseCluster}
+          DATABASE_NAME: 'myawesomedatabase'
       Events:
         Api:
           Type: Api
@@ -359,4 +345,4 @@ Outputs:
     Value: !Sub arn:aws:rds:${AWS::Region}:${AWS::AccountId}:cluster:${DatabaseCluster}
   DBNAME:
     Description: Database Name
-    Value: !GetAtt 'DatabaseCluster.DatabaseName'
+    Value: 'myawesomedatabase'

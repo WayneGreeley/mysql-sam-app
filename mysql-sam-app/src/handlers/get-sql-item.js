@@ -17,15 +17,15 @@ exports.getItemsHandler = async (event) => {
     const id = event.pathParameters.id;
     console.info('id:', id);
 
-    params.sql = `SELECT * FROM Persons WHERE userId='${id}' `
+    params.sql = `SELECT * FROM Persons WHERE userId='${id}' ;`
 
+    let result = {}
     try {
-        const result = await RDS.executeStatement(params).promise();
+        result = await RDS.executeStatement(params).promise();
+        console.log("result",result);
     } catch (error) {
         console.error(error)
     }
-
-    console.log("result",result);
 
     const response = {
         statusCode: 200,
