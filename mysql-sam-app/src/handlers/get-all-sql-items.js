@@ -5,7 +5,8 @@ var params = {
     secretArn: process.env.SECRET_ARN,
     resourceArn: process.env.CLUSTER_ARN,
     database: process.env.DATABASE_NAME,
-    sql: ''
+    sql: '',
+    includeResultMetadata: true
 };
 
 /**
@@ -28,7 +29,7 @@ exports.getAllItemsHandler = async (event) => {
 
     const response = {
         statusCode: 200,
-        body: JSON.stringify(results)
+        body: JSON.stringify(result)
     };
 
     // All log statements are written to CloudWatch

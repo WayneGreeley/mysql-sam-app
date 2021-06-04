@@ -5,7 +5,8 @@ var params = {
     secretArn: process.env.SECRET_ARN,
     resourceArn: process.env.CLUSTER_ARN,
     database: process.env.DATABASE_NAME,
-    sql: ''
+    sql: '',
+    includeResultMetadata: true
 };
 
 /**
