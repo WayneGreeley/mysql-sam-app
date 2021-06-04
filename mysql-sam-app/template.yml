@@ -301,7 +301,9 @@ Resources:
               Resource: !Ref RDSSecret
       Environment:
         Variables:
-          SECRET_LINK: !Ref RDSSecret
+          SECRET_ARN: !Ref RDSSecret
+          CLUSTER_ARN: !Sub arn:aws:rds:${AWS::Region}:${AWS::AccountId}:cluster:${DatabaseCluster}
+          DATABASE_NAME: !GetAtt 'DatabaseCluster.DatabaseName'
       Events:
         Api:
           Type: Api
@@ -352,3 +354,9 @@ Outputs:
   SecretARN:
     Description: SecretARN for RDS connection
     Value: !Ref RDSSecret
+  ClusterARN:
+    Description: ClusterARN for RDS connection
+    Value: !Sub arn:aws:rds:${AWS::Region}:${AWS::AccountId}:cluster:${DatabaseCluster}
+  DBNAME:
+    Description: Database Name
+    Value: !GetAtt 'DatabaseCluster.DatabaseName'

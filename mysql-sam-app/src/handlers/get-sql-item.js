@@ -1,11 +1,11 @@
 const AWS = require('aws-sdk');
-const Knex = require('knex');
-
-const secretclient = new AWS.SecretsManager();
-const secretlink = process.env.SECRET_LINK;
+const RDS = new AWS.RDSDataService();
 
 var params = {
-    SecretId: secretlink
+    secretArn: process.env.SECRET_ARN,
+    resourceArn: process.env.CLUSTER_ARN,
+    database: process.env.DATABASE_NAME,
+    sql: ''
 };
 
 /**
@@ -13,34 +13,17 @@ var params = {
  */
 exports.getItemsHandler = async (event) => {
     // All log statements are written to CloudWatch
-    console.info('received:', event);
-    console.log("secretlink",secretlink);
+    console.info('params:', params);
     const id = event.pathParameters.id;
     console.info('id:', id);
 
-    const secretResponse = await secretclient.getSecretValue(params).promise();
-    
-    const database = JSON.parse(secretResponse.SecretString).dbname;
-    const port = JSON.parse(secretResponse.SecretString).port;
-    const host = JSON.parse(secretResponse.SecretString).host;
-    const user = JSON.parse(secretResponse.SecretString).username;
-    const password = JSON.parse(secretResponse.SecretString).password;
-    
-    const connection = {
-        //ssl: { rejectUnauthorized = false },
-        host,
-        user,
-        password,
-        database,
+    params.sql = `SELECT * FROM Persons WHERE userId='${id}' `
+
+    try {
+        const result = await RDS.executeStatement(params).promise();
+    } catch (error) {
+        console.error(error)
     }
-    
-    const knex = Knex({
-        client: 'mysql',
-        connection,
-    })
-    
-    // Run your query http://knexjs.org/
-    const result = await knex('Persons').select().where('userId', id)
 
     console.log("result",result);
 
