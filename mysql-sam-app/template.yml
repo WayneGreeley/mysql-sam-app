@@ -116,13 +116,7 @@ Resources:
       EnableDnsSupport: true
       EnableDnsHostnames: true
       InstanceTenancy: default
-  InternetGateway:
-    Type: AWS::EC2::InternetGateway
-  VPCGatewayAttachment:
-    Type: AWS::EC2::VPCGatewayAttachment
-    Properties:
-      VpcId: !Ref VPC
-      InternetGatewayId: !Ref InternetGateway
+      
   SubnetA:
     Type: AWS::EC2::Subnet
     Properties:
@@ -131,7 +125,7 @@ Resources:
         - Fn::GetAZs: !Ref 'AWS::Region'
       VpcId: !Ref VPC
       CidrBlock: 10.0.1.0/24
-      MapPublicIpOnLaunch: true
+      MapPublicIpOnLaunch: false
   SubnetB:
     Type: AWS::EC2::Subnet
     Properties:
@@ -145,17 +139,7 @@ Resources:
     Type: AWS::EC2::RouteTable
     Properties:
       VpcId: !Ref VPC
-  RouteTableForNATG:
-    Type: AWS::EC2::RouteTable
-    Properties:
-      VpcId: !Ref VPC
-  InternetRoute:
-    Type: AWS::EC2::Route
-    DependsOn: VPCGatewayAttachment
-    Properties:
-      DestinationCidrBlock: 0.0.0.0/0
-      GatewayId: !Ref InternetGateway
-      RouteTableId: !Ref RouteTable
+      
   SubnetARouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
@@ -164,36 +148,53 @@ Resources:
   SubnetBRouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      RouteTableId: !Ref RouteTableForNATG
+      RouteTableId: !Ref RouteTable
       SubnetId: !Ref SubnetB
   SecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupName: "Internet Group"
-      GroupDescription: "SSH traffic in, all traffic out."
+      GroupName: "DB Group"
+      GroupDescription: "mysql 3306, 443 to secret vpce"
       VpcId: !Ref VPC
       SecurityGroupIngress:
-        - IpProtocol: -1
+        - IpProtocol: tcp
           CidrIp: 0.0.0.0/0
+          FromPort: 443
+          ToPort: 443
+        - IpProtocol: tcp
+          CidrIp: 0.0.0.0/0
+          FromPort: 3306
+          ToPort: 3306
       SecurityGroupEgress:
-        - IpProtocol: -1
+        - IpProtocol: tcp
           CidrIp: 0.0.0.0/0
-  EIP:
-    Type: 'AWS::EC2::EIP'
+          FromPort: 443
+          ToPort: 443
+        - IpProtocol: tcp
+          CidrIp: 0.0.0.0/0
+          FromPort: 3306
+          ToPort: 3306
+
+  SecretsEndpoint:
+    Type: 'AWS::EC2::VPCEndpoint'
     Properties:
-      Domain: vpc
-    DependsOn: VPCGatewayAttachment
-  NatGateway:
-    Type: 'AWS::EC2::NatGateway'
-    Properties:
-      AllocationId: !GetAtt 'EIP.AllocationId'
-      SubnetId: !Ref SubnetA
-  Route:
-    Type: 'AWS::EC2::Route'
-    Properties:
-      RouteTableId: !Ref RouteTableForNATG
-      DestinationCidrBlock: '0.0.0.0/0'
-      NatGatewayId: !Ref NatGateway
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal: '*'
+            Action:
+              - 'secretsmanager:GetSecretValue'
+            Resource:
+              - '*'
+      PrivateDnsEnabled: true
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.secretsmanager'
+      SecurityGroupIds: 
+        - !Ref SecurityGroup
+      VpcEndpointType: Interface
+      VpcId: !Ref VPC
+
+      
   DatabaseSubnetGroup:
     Type: AWS::RDS::DBSubnetGroup
     Properties:
@@ -245,7 +246,15 @@ Resources:
       MemorySize: 2048
       Timeout: 29
       Description: A simple example includes a HTTP get method to get all items from a MYSQL table.
+      VpcConfig:
+        SecurityGroupIds:
+        - !Ref SecurityGroup
+        SubnetIds:
+          - !Ref SubnetA
+          - !Ref SubnetB
       Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaVPCAccessExecutionRole
         - Version: '2012-10-17' # Policy Document
           Statement:
             - Effect: Allow

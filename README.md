@@ -69,6 +69,3 @@ insert into Persons (userId, firstName, lastName) values (1, 'foo', 'bar');
 
 
 
-TODO: get secret promise is not resolving
-
-    const secretResponse = await secretclient.getSecretValue(params).promise();
