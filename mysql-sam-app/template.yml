@@ -178,19 +178,13 @@ Resources:
   SecretsEndpoint:
     Type: 'AWS::EC2::VPCEndpoint'
     Properties:
-      PolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Effect: Allow
-            Principal: '*'
-            Action:
-              - 'secretsmanager:GetSecretValue'
-            Resource:
-              - '*'
       PrivateDnsEnabled: true
       ServiceName: !Sub 'com.amazonaws.${AWS::Region}.secretsmanager'
       SecurityGroupIds: 
         - !Ref SecurityGroup
+      SubnetIds:
+        - !Ref SubnetA
+        - !Ref SubnetB
       VpcEndpointType: Interface
       VpcId: !Ref VPC
 
