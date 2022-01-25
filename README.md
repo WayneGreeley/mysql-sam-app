@@ -15,6 +15,8 @@ SAM application with mysql
 - sam deploy --guided
 ![sam deploy](/images/sam-deploy.png "sam deploy")
 
+- sam delete --no-prompts
+
 - test put-item
 ```
  POST: https://<YOUR_ID>.execute-api.us-east-1.amazonaws.com/Prod/
