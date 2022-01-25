@@ -188,6 +188,32 @@ Resources:
       VpcEndpointType: Interface
       VpcId: !Ref VPC
 
+  RdsEndpoint:
+    Type: 'AWS::EC2::VPCEndpoint'
+    Properties:
+      PrivateDnsEnabled: true
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.rds'
+      SecurityGroupIds: 
+        - !Ref SecurityGroup
+      SubnetIds:
+        - !Ref SubnetA
+        - !Ref SubnetB
+      VpcEndpointType: Interface
+      VpcId: !Ref VPC
+
+  RdsDataEndpoint:
+    Type: 'AWS::EC2::VPCEndpoint'
+    Properties:
+      PrivateDnsEnabled: true
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.rds-data'
+      SecurityGroupIds: 
+        - !Ref SecurityGroup
+      SubnetIds:
+        - !Ref SubnetA
+        - !Ref SubnetB
+      VpcEndpointType: Interface
+      VpcId: !Ref VPC
+
       
   DatabaseSubnetGroup:
     Type: AWS::RDS::DBSubnetGroup
