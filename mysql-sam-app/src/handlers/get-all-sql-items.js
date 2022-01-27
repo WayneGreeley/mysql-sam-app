@@ -1,6 +1,14 @@
 const AWS = require('aws-sdk');
 const RDS = new AWS.RDSDataService();
 
+const data = require('data-api-client')({
+  secretArn: process.env.SECRET_ARN,
+  resourceArn: process.env.CLUSTER_ARN,
+  database: process.env.DATABASE_NAME
+})
+
+// import { ExecuteStatementResponse } from 'aws-sdk/clients/rdsdataservice';
+
 var params = {
     secretArn: process.env.SECRET_ARN,
     resourceArn: process.env.CLUSTER_ARN,
@@ -22,10 +30,16 @@ exports.getAllItemsHandler = async (event) => {
     let result = {}
     try {
         result = await RDS.executeStatement(params).promise();
-        console.log("result",result);
+        console.log("result",result.records);
     } catch (error) {
         console.error(error)
     }
+    
+    let data_result = await data.query(`SELECT * FROM Persons ;`)
+    console.log("data_result",data_result);
+
+        //let countResponse: ExecuteStatementResponse = await rds.executeStatement(checkUserEmailSQL).promise();
+        //console.log(`${ServiceName} - invite.handle - rds-checkEmailInUse RES`, JSON.stringify(countResponse.records));
 
     const response = {
         statusCode: 200,
